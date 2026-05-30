@@ -45,6 +45,50 @@ function Get-PropertyValue {
     return $property.Value
 }
 
+function Set-ShapeStyle {
+    param($Shape, $Spec)
+
+    $fill = [string] (Get-PropertyValue $Spec 'fill' 'RGB(245, 247, 250)')
+    $line = [string] (Get-PropertyValue $Spec 'line' 'RGB(58, 89, 128)')
+    $lineWeight = [string] (Get-PropertyValue $Spec 'lineWeight' '1.25 pt')
+    $fontSize = [string] (Get-PropertyValue $Spec 'fontSize' '10 pt')
+    $font = [string] (Get-PropertyValue $Spec 'font' 'Arial')
+    $fontColor = [string] (Get-PropertyValue $Spec 'fontColor' 'RGB(0, 0, 0)')
+
+    if ($fill -eq 'none') {
+        $Shape.CellsU('FillPattern').FormulaU = '0'
+    } else {
+        $Shape.CellsU('FillForegnd').FormulaU = $fill
+    }
+
+    if ($line -eq 'none') {
+        $Shape.CellsU('LinePattern').FormulaU = '0'
+    } else {
+        $Shape.CellsU('LineColor').FormulaU = $line
+        $Shape.CellsU('LineWeight').FormulaU = $lineWeight
+    }
+
+    $Shape.CellsU('Char.Size').FormulaU = $fontSize
+    $Shape.CellsU('Char.Font').FormulaU = "FONT(`"$font`")"
+    $Shape.CellsU('Char.Color').FormulaU = $fontColor
+    $Shape.CellsU('Para.HorzAlign').FormulaU = [string] (Get-PropertyValue $Spec 'hAlign' '1')
+    $Shape.CellsU('VerticalAlign').FormulaU = [string] (Get-PropertyValue $Spec 'vAlign' '1')
+}
+
+function New-BasicShape {
+    param($Page, [double] $X, [double] $Y, [double] $Width, [double] $Height, [string] $ShapeKind)
+
+    if ($ShapeKind -eq 'ellipse' -or $ShapeKind -eq 'circle') {
+        return $Page.DrawOval($X - $Width / 2, $Y - $Height / 2, $X + $Width / 2, $Y + $Height / 2)
+    }
+
+    $shape = $Page.DrawRectangle($X - $Width / 2, $Y - $Height / 2, $X + $Width / 2, $Y + $Height / 2)
+    if ($ShapeKind -eq 'roundRect' -or $ShapeKind -eq 'roundedRectangle' -or $ShapeKind -eq 'rectangle') {
+        $shape.CellsU('Rounding').FormulaU = [string] (Get-PropertyValue ([pscustomobject]@{}) 'rounding' '0.08 in')
+    }
+    return $shape
+}
+
 function Add-Node {
     param($Page, $Node)
 
@@ -53,20 +97,29 @@ function Add-Node {
     $width = [double] (Get-PropertyValue $Node 'width' 1.6)
     $height = [double] (Get-PropertyValue $Node 'height' 0.75)
     $shapeKind = [string] (Get-PropertyValue $Node 'shape' 'rectangle')
+    $layerCopies = [int] (Get-PropertyValue $Node 'layerCopies' 0)
+    $offsetX = [double] (Get-PropertyValue $Node 'copyOffsetX' 0.16)
+    $offsetY = [double] (Get-PropertyValue $Node 'copyOffsetY' 0.10)
 
-    if ($shapeKind -eq 'ellipse') {
-        $shape = $Page.DrawOval($x - $width / 2, $y - $height / 2, $x + $width / 2, $y + $height / 2)
-    } else {
-        $shape = $Page.DrawRectangle($x - $width / 2, $y - $height / 2, $x + $width / 2, $y + $height / 2)
-        $shape.CellsU('Rounding').FormulaU = '0.08 in'
+    for ($i = $layerCopies; $i -ge 1; $i -= 1) {
+        $copyShape = New-BasicShape $Page ($x + $i * $offsetX) ($y + $i * $offsetY) $width $height $shapeKind
+        $copySpec = [pscustomobject]@{
+            fill = [string] (Get-PropertyValue $Node 'copyFill' (Get-PropertyValue $Node 'fill' 'RGB(245, 247, 250)'))
+            line = [string] (Get-PropertyValue $Node 'copyLine' 'RGB(190, 190, 190)')
+            lineWeight = [string] (Get-PropertyValue $Node 'copyLineWeight' '1 pt')
+            fontSize = '1 pt'
+            fontColor = 'RGB(255, 255, 255)'
+        }
+        Set-ShapeStyle $copyShape $copySpec
+        $copyShape.Text = ''
     }
 
+    $shape = New-BasicShape $Page $x $y $width $height $shapeKind
+    if ($shapeKind -ne 'ellipse' -and $shapeKind -ne 'circle') {
+        $shape.CellsU('Rounding').FormulaU = [string] (Get-PropertyValue $Node 'rounding' '0.08 in')
+    }
     $shape.Text = [string] (Get-PropertyValue $Node 'text' (Get-PropertyValue $Node 'id' 'Node'))
-    $shape.CellsU('FillForegnd').FormulaU = [string] (Get-PropertyValue $Node 'fill' 'RGB(245, 247, 250)')
-    $shape.CellsU('LineColor').FormulaU = [string] (Get-PropertyValue $Node 'line' 'RGB(58, 89, 128)')
-    $shape.CellsU('LineWeight').FormulaU = '1.25 pt'
-    $shape.CellsU('Char.Size').FormulaU = '10 pt'
-    $shape.CellsU('Para.HorzAlign').FormulaU = '1'
+    Set-ShapeStyle $shape $Node
 
     return [pscustomobject]@{
         Id = [string] (Get-PropertyValue $Node 'id' $shape.ID)
@@ -109,7 +162,7 @@ function Add-Link {
 
     $line = $Page.DrawLine($p1.X, $p1.Y, $p2.X, $p2.Y)
     $line.CellsU('LineColor').FormulaU = [string] (Get-PropertyValue $Link 'line' 'RGB(80, 80, 80)')
-    $line.CellsU('LineWeight').FormulaU = '1.25 pt'
+    $line.CellsU('LineWeight').FormulaU = [string] (Get-PropertyValue $Link 'lineWeight' '1.25 pt')
 
     $style = [string] (Get-PropertyValue $Link 'style' 'arrow')
     if ($style -ne 'line') {
@@ -119,10 +172,64 @@ function Add-Link {
     $text = [string] (Get-PropertyValue $Link 'text' '')
     if ($text.Length -gt 0) {
         $line.Text = $text
-        $line.CellsU('Char.Size').FormulaU = '8 pt'
+        $line.CellsU('Char.Size').FormulaU = [string] (Get-PropertyValue $Link 'fontSize' '8 pt')
+        $line.CellsU('Char.Font').FormulaU = "FONT(`"$([string] (Get-PropertyValue $Link 'font' 'Arial'))`")"
     }
 
     return $line
+}
+
+function Add-Arrow {
+    param($Page, $Arrow)
+
+    $x1 = [double] (Get-PropertyValue $Arrow 'x1' 0)
+    $y1 = [double] (Get-PropertyValue $Arrow 'y1' 0)
+    $x2 = [double] (Get-PropertyValue $Arrow 'x2' 1)
+    $y2 = [double] (Get-PropertyValue $Arrow 'y2' 1)
+
+    $line = $Page.DrawLine($x1, $y1, $x2, $y2)
+    $line.CellsU('LineColor').FormulaU = [string] (Get-PropertyValue $Arrow 'line' 'RGB(0, 0, 0)')
+    $line.CellsU('LineWeight').FormulaU = [string] (Get-PropertyValue $Arrow 'lineWeight' '1.5 pt')
+
+    $style = [string] (Get-PropertyValue $Arrow 'style' 'arrow')
+    if ($style -ne 'line') {
+        $line.CellsU('EndArrow').FormulaU = [string] (Get-PropertyValue $Arrow 'endArrow' '13')
+    }
+    if ([bool] (Get-PropertyValue $Arrow 'beginArrow' $false)) {
+        $line.CellsU('BeginArrow').FormulaU = '13'
+    }
+
+    $text = [string] (Get-PropertyValue $Arrow 'text' '')
+    if ($text.Length -gt 0) {
+        $line.Text = $text
+        $line.CellsU('Char.Size').FormulaU = [string] (Get-PropertyValue $Arrow 'fontSize' '8 pt')
+        $line.CellsU('Char.Font').FormulaU = "FONT(`"$([string] (Get-PropertyValue $Arrow 'font' 'Arial'))`")"
+    }
+
+    return $line
+}
+
+function Add-Label {
+    param($Page, $Label)
+
+    $x = [double] (Get-PropertyValue $Label 'x' 1)
+    $y = [double] (Get-PropertyValue $Label 'y' 1)
+    $width = [double] (Get-PropertyValue $Label 'width' 1.5)
+    $height = [double] (Get-PropertyValue $Label 'height' 0.35)
+    $shape = $Page.DrawRectangle($x - $width / 2, $y - $height / 2, $x + $width / 2, $y + $height / 2)
+    $shape.Text = [string] (Get-PropertyValue $Label 'text' '')
+
+    $labelSpec = [pscustomobject]@{
+        fill = [string] (Get-PropertyValue $Label 'fill' 'none')
+        line = [string] (Get-PropertyValue $Label 'line' 'none')
+        font = [string] (Get-PropertyValue $Label 'font' 'Arial')
+        fontSize = [string] (Get-PropertyValue $Label 'fontSize' '12 pt')
+        fontColor = [string] (Get-PropertyValue $Label 'fontColor' 'RGB(0, 0, 0)')
+        hAlign = [string] (Get-PropertyValue $Label 'hAlign' '1')
+        vAlign = [string] (Get-PropertyValue $Label 'vAlign' '1')
+    }
+    Set-ShapeStyle $shape $labelSpec
+    return $shape
 }
 
 function Add-Title {
@@ -135,6 +242,7 @@ function Add-Title {
     $shape.CellsU('FillPattern').FormulaU = '0'
     $shape.CellsU('LinePattern').FormulaU = '0'
     $shape.CellsU('Char.Size').FormulaU = '18 pt'
+    $shape.CellsU('Char.Font').FormulaU = 'FONT("Arial")'
     $shape.CellsU('Para.HorzAlign').FormulaU = '1'
 }
 
@@ -148,9 +256,12 @@ function Add-Note {
 
     $shape = $Page.DrawRectangle($x, $y, $x + $width, $y + $height)
     $shape.Text = [string] (Get-PropertyValue $Note 'text' '')
-    $shape.CellsU('FillForegnd').FormulaU = [string] (Get-PropertyValue $Note 'fill' 'RGB(245, 247, 250)')
-    $shape.CellsU('LineColor').FormulaU = [string] (Get-PropertyValue $Note 'line' 'RGB(190, 190, 190)')
-    $shape.CellsU('Char.Size').FormulaU = '9 pt'
+    Set-ShapeStyle $shape ([pscustomobject]@{
+        fill = [string] (Get-PropertyValue $Note 'fill' 'RGB(245, 247, 250)')
+        line = [string] (Get-PropertyValue $Note 'line' 'RGB(190, 190, 190)')
+        fontSize = [string] (Get-PropertyValue $Note 'fontSize' '9 pt')
+        font = [string] (Get-PropertyValue $Note 'font' 'Arial')
+    })
 }
 
 if ($SpecPath) {
@@ -203,6 +314,14 @@ foreach ($node in @(Get-PropertyValue $spec 'nodes' @())) {
 
 foreach ($link in @(Get-PropertyValue $spec 'links' @())) {
     Add-Link $page $link $nodeMap | Out-Null
+}
+
+foreach ($arrow in @(Get-PropertyValue $spec 'arrows' @())) {
+    Add-Arrow $page $arrow | Out-Null
+}
+
+foreach ($label in @(Get-PropertyValue $spec 'labels' @())) {
+    Add-Label $page $label | Out-Null
 }
 
 foreach ($note in @(Get-PropertyValue $spec 'notes' @())) {

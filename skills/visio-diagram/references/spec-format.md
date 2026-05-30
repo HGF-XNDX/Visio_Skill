@@ -29,6 +29,25 @@ The bundled script accepts a JSON object with this shape:
       "style": "arrow"
     }
   ],
+  "arrows": [
+    {
+      "x1": 5.5,
+      "y1": 4.2,
+      "x2": 5.5,
+      "y2": 5.1,
+      "style": "arrow"
+    }
+  ],
+  "labels": [
+    {
+      "text": "Dense Layer",
+      "x": 7.1,
+      "y": 6.4,
+      "width": 1.8,
+      "height": 0.35,
+      "fontSize": "16 pt"
+    }
+  ],
   "notes": [
     {
       "text": "Optional note text",
@@ -53,7 +72,11 @@ Optional fields:
 - `title`: large centered title near the top of the page.
 - `page.name`, `page.width`, `page.height`.
 - `nodes[].width`, `nodes[].height`, `nodes[].fill`, `nodes[].line`, `nodes[].shape`.
+- `nodes[].font`, `nodes[].fontSize`, `nodes[].fontColor`, `nodes[].lineWeight`.
+- `nodes[].layerCopies`, `nodes[].copyOffsetX`, `nodes[].copyOffsetY`, `nodes[].copyFill`, `nodes[].copyLine`.
 - `links[].text`, `links[].style`; use `arrow` for a directed connector or `line` for no arrow.
+- `arrows[]`: explicit coordinate arrows with `x1`, `y1`, `x2`, `y2`, optional `text`, `line`, `lineWeight`, `style`.
+- `labels[]`: free-positioned text boxes. They default to no fill and no border.
 - `notes[]`: labeled note rectangles.
 
 Default colors:
@@ -64,4 +87,50 @@ Default colors:
 - Queue or worker: `RGB(237, 231, 246)`
 - Warning or cache: `RGB(255, 235, 238)`
 
-The script draws direct connectors between node edges based on node center positions. For complex routing, add intermediate nodes or revise the layout.
+The script draws direct connectors between node edges based on node center positions. For complex routing or paper-style diagrams, use explicit `arrows`.
+
+## Paper-Figure Example Pattern
+
+Use a square page, explicit coordinates, larger fonts, and `layerCopies` for repeated stacked elements:
+
+```json
+{
+  "page": { "name": "Attention Figure", "width": 8, "height": 8 },
+  "nodes": [
+    {
+      "id": "sdpa",
+      "text": "Scaled Dot Product Attention (SDPA)",
+      "shape": "roundRect",
+      "x": 4,
+      "y": 4.1,
+      "width": 7.2,
+      "height": 0.8,
+      "fill": "RGB(224, 210, 235)",
+      "line": "RGB(145, 105, 170)",
+      "lineWeight": "1.6 pt",
+      "fontSize": "20 pt",
+      "layerCopies": 3,
+      "copyOffsetX": 0.12,
+      "copyOffsetY": 0.10
+    },
+    {
+      "id": "g1",
+      "text": "G1",
+      "shape": "circle",
+      "x": 4,
+      "y": 5.45,
+      "width": 0.62,
+      "height": 0.62,
+      "fill": "RGB(176, 197, 233)",
+      "line": "none",
+      "fontSize": "18 pt"
+    }
+  ],
+  "arrows": [
+    { "x1": 4, "y1": 4.5, "x2": 4, "y2": 5.15, "lineWeight": "1.8 pt" }
+  ],
+  "labels": [
+    { "text": "Most Effective!", "x": 2.4, "y": 5.45, "width": 1.8, "height": 0.35, "fontSize": "16 pt" }
+  ]
+}
+```

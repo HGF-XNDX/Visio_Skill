@@ -50,6 +50,8 @@ Use `references/spec-format.md` for the JSON schema and examples. Keep generated
 - `page`: optional page settings.
 - `nodes`: boxes with `id`, `text`, `x`, `y`, optional `width`, `height`, `fill`.
 - `links`: connectors using `from`, `to`, optional `text`, `style`.
+- `arrows`: explicit coordinate arrows for academic figures or non-graph layouts.
+- `labels`: free-positioned text labels with no border/fill by default.
 - `groups` or advanced Visio masters are not required unless the user asks.
 
 Coordinates are in Visio inches. The origin is bottom-left. A good default page is 11 by 8.5 inches.
@@ -61,6 +63,16 @@ Coordinates are in Visio inches. The origin is bottom-left. A good default page 
 - Use short labels on connectors.
 - Use pastel fills for node categories; avoid relying only on color to encode meaning.
 - Prefer creating a new `.vsdx` unless the user explicitly asks to modify the current Visio document.
+
+For paper-figure recreation or reference-image style diagrams:
+
+- If the user asks for a neural-network/attention-style figure, inspect `references/attention-figure-example.json` as a concrete pattern.
+- Use explicit `x`, `y`, `width`, and `height` for every shape; do not rely on auto layout.
+- Use `arrows` for precise vertical or diagonal arrows instead of `links` when the figure is not a simple graph.
+- Use `labels` for annotations such as "Dense Layer" or "Most Effective!" instead of encoding them as nodes.
+- Use `layerCopies`, `copyOffsetX`, and `copyOffsetY` for stacked blocks or repeated translucent circles.
+- Keep the page close to the target aspect ratio. For square source figures, prefer an 8 by 8 inch page.
+- Set `font: "Arial"` and explicit `fontSize` values for readable output.
 
 ## Automation Boundary
 
