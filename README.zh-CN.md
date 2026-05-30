@@ -4,7 +4,7 @@
 
 使用 Codex 根据文字描述生成可编辑的 Microsoft Visio `.vsdx` 图纸。
 
-这个仓库包含一个 Codex 插件，插件里有一个 `visio-diagram` skill。它采用纯脚本流程：Codex 先生成一份 JSON 图规格，然后运行仓库内置的 PowerShell 脚本，通过 Microsoft Visio 的 COM 对象模型创建 `.vsdx` 文件。
+这个仓库包含一个 Codex 插件，其中有一个 `visio-diagram` skill。它采用纯脚本流程：Codex 先生成 JSON 图规范，然后运行仓库内置的 PowerShell 脚本，通过 Microsoft Visio COM 对象模型创建 `.vsdx` 文件。
 
 它不使用 Computer Use、截图、鼠标点击、键盘输入或桌面 UI 自动化。
 
@@ -19,10 +19,9 @@ Visio 网页版和 macOS 不支持这套 COM 自动化路径。
 
 ## 可以创建什么
 
-- 架构图
-- 网络图和拓扑图
-- 流程图
-- 业务流程图
+- 架构图、网络图、拓扑图、流程图和过程图
+- 论文风格方法图，包括面板、表格、列表、树、图标、圆柱体和路由连接线
+- 论文里的紧凑图表面板，包括柱状图和折线图
 - 包含形状、标签、颜色和连接线的可编辑 `.vsdx` 文件
 
 ## 仓库结构
@@ -32,16 +31,18 @@ Visio 网页版和 macOS 不支持这套 COM 自动化路径。
 skills/visio-diagram/SKILL.md
 skills/visio-diagram/scripts/new_visio_diagram.ps1
 skills/visio-diagram/references/spec-format.md
+figure-tests/
 ```
 
-## 工作原理
+## 其他用户如何安装
 
-1. 用户描述想要的图。
-2. Codex 调用 `visio-diagram` skill。
-3. Codex 写入一份 JSON 图规格。
-4. `new_visio_diagram.ps1` 通过 COM 打开或启动 Visio。
-5. 脚本创建一个可编辑的 `.vsdx` 文件。
-6. Codex 通过脚本输出、文件是否存在、文件大小和 COM 返回的形状数量进行验证。
+在 Codex 中从这个 GitHub 仓库 URL 安装 skill/plugin：
+
+```text
+https://github.com/HGF-XNDX/Codex_Visio_Skill
+```
+
+安装后，在提示词里要求 Codex 使用 `$visio-diagram`。
 
 ## 脚本冒烟测试
 
@@ -51,13 +52,7 @@ skills/visio-diagram/references/spec-format.md
 PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -Json
 ```
 
-期望输出是一段紧凑 JSON：
-
-```json
-{"OutputPath":"...sample.vsdx","Document":"sample.vsdx","Page":"Architecture","ShapeCount":13}
-```
-
-如果希望生成后让 Visio 显示该文件，可以加上 `-Open`：
+如果希望生成后让 Visio 保持打开，可以加上 `-Open`：
 
 ```powershell
 PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -Open
@@ -66,25 +61,16 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scrip
 ## 示例 Codex 提示词
 
 ```text
-Use $visio-diagram to create a Visio architecture diagram:
-Client -> API Gateway -> API Service -> Worker -> Database.
-Also show Redis cache connected to API Service.
-Save it as architecture.vsdx.
-```
-
-也可以直接用中文描述：
-
-```text
-使用 $visio-diagram 创建一张 Visio 架构图：
-用户浏览器访问 API 网关，API 网关转发到订单服务；
-订单服务连接 Redis 缓存、消息队列和数据库；
-后台 Worker 从消息队列消费任务并写入数据库。
-保存为 order-architecture.vsdx。
+使用 $visio-diagram 创建一张可编辑的 Visio 论文方法图。
+画一个候选池工作流：包含初始化模块、while budget 循环、
+score matrix 表格、best candidate 表格、Pareto frontier 面板、
+D_train 圆柱体，以及虚线 sample 连接线。
+保存为 paper-method.vsdx。
 ```
 
 ## 注意事项
 
 - 生成的文件可以在 Visio 中继续编辑。
-- skill 默认创建新的 `.vsdx` 文件。
-- 如果目标文件已存在，脚本默认不会覆盖；确认需要覆盖时才使用 `-Force`。
+- 如果目标文件已经存在，脚本默认不会覆盖；确认需要覆盖时才使用 `-Force`。
+- 不加 `-Open` 时，脚本会保存并关闭文档，避免文件被锁住。
 - 脚本不会运行 Visio 宏。

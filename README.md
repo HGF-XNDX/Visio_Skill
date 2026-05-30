@@ -19,10 +19,9 @@ Visio for the web and macOS do not support this COM automation path.
 
 ## What It Can Create
 
-- Architecture diagrams
-- Network and topology diagrams
-- Flowcharts
-- Process diagrams
+- Architecture, network, topology, process, and flow diagrams
+- Paper-style method figures with panels, tables, lists, trees, icons, cylinders, and routed connectors
+- Compact paper chart panels including bar charts and line charts
 - Editable `.vsdx` files with shapes, labels, colors, and connectors
 
 ## Repository Layout
@@ -32,16 +31,18 @@ Visio for the web and macOS do not support this COM automation path.
 skills/visio-diagram/SKILL.md
 skills/visio-diagram/scripts/new_visio_diagram.ps1
 skills/visio-diagram/references/spec-format.md
+figure-tests/
 ```
 
-## How It Works
+## How Other Users Install It
 
-1. The user describes a diagram.
-2. Codex invokes the `visio-diagram` skill.
-3. Codex writes a JSON diagram spec.
-4. `new_visio_diagram.ps1` opens or starts Visio through COM.
-5. The script creates an editable `.vsdx` file.
-6. Codex verifies by script output, file existence, file size, and COM-reported shape count.
+In Codex, install the skill/plugin from this GitHub repository URL:
+
+```text
+https://github.com/HGF-XNDX/Codex_Visio_Skill
+```
+
+After installation, ask Codex to use `$visio-diagram`.
 
 ## Script Smoke Test
 
@@ -49,12 +50,6 @@ From the repository root:
 
 ```powershell
 PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -Json
-```
-
-Expected output is compact JSON:
-
-```json
-{"OutputPath":"...sample.vsdx","Document":"sample.vsdx","Page":"Architecture","ShapeCount":13}
 ```
 
 Add `-Open` to leave the generated file visible in Visio:
@@ -66,15 +61,16 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scrip
 ## Example Codex Prompt
 
 ```text
-Use $visio-diagram to create a Visio architecture diagram:
-Client -> API Gateway -> API Service -> Worker -> Database.
-Also show Redis cache connected to API Service.
-Save it as architecture.vsdx.
+Use $visio-diagram to create an editable Visio method figure.
+Draw a candidate-pool workflow with an initialization block, while-budget loop,
+a score matrix table, a best-candidate table, a Pareto frontier panel,
+a D_train cylinder, and dashed sample connectors.
+Save it as paper-method.vsdx.
 ```
 
 ## Notes
 
-- The generated file is editable in Visio.
-- The skill defaults to creating a new `.vsdx`.
+- Generated files are editable in Visio.
 - Existing output files are not overwritten unless the script is run with `-Force`.
+- Without `-Open`, the script saves and closes the document to avoid locking files.
 - The script does not run Visio macros.

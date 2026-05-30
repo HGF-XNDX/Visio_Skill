@@ -52,11 +52,16 @@ Use `references/spec-format.md` for the JSON schema and examples. Keep generated
 - `links`: connectors using `from`, `to`, optional `text`, `style`.
 - `arrows`: explicit coordinate arrows for academic figures or non-graph layouts.
 - `labels`: free-positioned text labels with no border/fill by default.
+- `panels`: section boxes with optional title bars for paper figure modules.
 - `tables`: grid layouts for score matrices, module descriptions, and compact comparison panels.
 - `cylinders`: database or dataset symbols such as `Dtrain`.
+- `icons`: small document, chip, database/dataset, and funnel symbols.
+- `lists`: compact bullet or numbered lists inside method/detail panels.
 - `trees`: small node-edge subgraphs inside larger figures.
 - `barCharts`: compact performance charts for paper overview figures.
+- `lineCharts`: compact trend charts with one or more series.
 - `elbowConnectors`: routed multi-segment connectors when straight lines cross important content.
+- `curvedConnectors`: smooth-looking sampled connectors for dotted sample paths or feedback loops.
 - `groups` or advanced Visio masters are not required unless the user asks.
 
 Coordinates are in Visio inches. The origin is bottom-left. A good default page is 11 by 8.5 inches.
@@ -76,11 +81,18 @@ For paper-figure recreation or reference-image style diagrams:
 - Use `arrows` for precise vertical or diagonal arrows instead of `links` when the figure is not a simple graph.
 - Use `labels` for annotations such as "Dense Layer" or "Most Effective!" instead of encoding them as nodes.
 - Use `tables` for score matrices, right-side method-detail boxes, and other dense rectangular content.
-- Use per-cell table objects (`{"text": "...", "fontColor": "...", "fontSize": "..."}`) for check/cross score matrices.
+- Use `colWidths`, `rowHeights`, `colSpan`, and `rowSpan` when recreating paper tables or matrices.
+- Use per-cell table objects (`{"text": "...", "fontColor": "...", "fontSize": "..."}`) for highlighted cells, score matrices, and merged notes.
+- Use `panels` to frame repeated modules such as "Propose New Candidate" or "Pareto-based Candidate Filtering".
+- Use `lists` for dense method notes rather than manually placing many labels.
 - Use `cylinders` for datasets, databases, memory stores, or corpus icons.
 - Use `barCharts` for small metric panels instead of drawing bars manually.
+- Use `lineCharts` for small trend panels, convergence curves, or training/evaluation traces.
+- Use `icons` for schematic document, model/chip, dataset, database, or filter symbols.
 - Use `elbowConnectors` when a connector must route around a panel.
+- Use `curvedConnectors` for sampled data paths, feedback arrows, and soft loop arrows.
 - Use `layerCopies`, `copyOffsetX`, and `copyOffsetY` for stacked blocks or repeated translucent circles.
+- Set `subscripts: true` on labels, tables, or lists to convert common tokens such as `P_new`, `D_train`, `G_1`, `W_k`, and `W_v` into subscript-like text.
 - Keep the page close to the target aspect ratio. For square source figures, prefer an 8 by 8 inch page.
 - Set `font: "Arial"` and explicit `fontSize` values for readable output.
 

@@ -1,20 +1,20 @@
 {
   "name": "visio-diagram",
-  "version": "0.1.0",
-  "description": "Generate editable Microsoft Visio diagrams from text descriptions using script-only Visio COM automation.",
+  "version": "0.2.0",
+  "description": "Generate editable Microsoft Visio diagrams and paper-style method figures from text descriptions using script-only Visio COM automation.",
   "author": {
     "name": "Local developer"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Visio Diagram",
-    "shortDescription": "Create editable Visio .vsdx diagrams.",
-    "longDescription": "Visio Diagram helps Codex convert architecture, network, topology, flow, and process descriptions into editable Microsoft Visio .vsdx files by generating a JSON diagram specification and running a bundled PowerShell script against Visio's COM automation API. It is a script-only workflow and does not rely on desktop UI automation.",
+    "shortDescription": "Create editable Visio .vsdx diagrams and paper figures.",
+    "longDescription": "Visio Diagram helps Codex convert architecture, network, topology, flow, process, and paper method figure descriptions into editable Microsoft Visio .vsdx files by generating a JSON diagram specification and running a bundled PowerShell script against Visio's COM automation API. It includes paper-oriented primitives such as panels, tables, lists, trees, icons, cylinders, bar charts, line charts, and routed connectors. It is a script-only workflow and does not rely on desktop UI automation.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [
       "skills"
     ],
-    "defaultPrompt": "Create an editable Visio .vsdx diagram from my architecture or flow description."
+    "defaultPrompt": "Create an editable Visio .vsdx diagram or paper-style method figure from my description."
   }
 }
