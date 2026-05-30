@@ -1,0 +1,6 @@
+interface:
+  display_name: "Visio Diagram"
+  short_description: "Create editable Visio .vsdx diagrams."
+  default_prompt: "Use $visio-diagram to create an editable Visio .vsdx diagram from my architecture or flow description."
+policy:
+  allow_implicit_invocation: true
