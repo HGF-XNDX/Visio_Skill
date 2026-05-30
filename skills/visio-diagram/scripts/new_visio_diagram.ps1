@@ -54,11 +54,16 @@ function Set-ShapeStyle {
     $fontSize = [string] (Get-PropertyValue $Spec 'fontSize' '10 pt')
     $font = [string] (Get-PropertyValue $Spec 'font' 'Arial')
     $fontColor = [string] (Get-PropertyValue $Spec 'fontColor' 'RGB(0, 0, 0)')
+    $linePattern = [string] (Get-PropertyValue $Spec 'linePattern' '1')
+    $fillTransparency = [string] (Get-PropertyValue $Spec 'fillTransparency' '')
 
     if ($fill -eq 'none') {
         $Shape.CellsU('FillPattern').FormulaU = '0'
     } else {
         $Shape.CellsU('FillForegnd').FormulaU = $fill
+        if ($fillTransparency.Length -gt 0) {
+            $Shape.CellsU('FillForegndTrans').FormulaU = $fillTransparency
+        }
     }
 
     if ($line -eq 'none') {
@@ -66,6 +71,7 @@ function Set-ShapeStyle {
     } else {
         $Shape.CellsU('LineColor').FormulaU = $line
         $Shape.CellsU('LineWeight').FormulaU = $lineWeight
+        $Shape.CellsU('LinePattern').FormulaU = $linePattern
     }
 
     $Shape.CellsU('Char.Size').FormulaU = $fontSize
@@ -83,6 +89,9 @@ function New-BasicShape {
     }
 
     $shape = $Page.DrawRectangle($X - $Width / 2, $Y - $Height / 2, $X + $Width / 2, $Y + $Height / 2)
+    if ($ShapeKind -eq 'diamond') {
+        $shape.CellsU('Angle').FormulaU = '45 deg'
+    }
     if ($ShapeKind -eq 'roundRect' -or $ShapeKind -eq 'roundedRectangle' -or $ShapeKind -eq 'rectangle') {
         $shape.CellsU('Rounding').FormulaU = [string] (Get-PropertyValue ([pscustomobject]@{}) 'rounding' '0.08 in')
     }
@@ -118,7 +127,25 @@ function Add-Node {
     if ($shapeKind -ne 'ellipse' -and $shapeKind -ne 'circle') {
         $shape.CellsU('Rounding').FormulaU = [string] (Get-PropertyValue $Node 'rounding' '0.08 in')
     }
-    $shape.Text = [string] (Get-PropertyValue $Node 'text' (Get-PropertyValue $Node 'id' 'Node'))
+    $angle = [string] (Get-PropertyValue $Node 'angle' '')
+    if ($angle.Length -gt 0) {
+        $shape.CellsU('Angle').FormulaU = $angle
+    }
+    $displayText = [string] (Get-PropertyValue $Node 'text' (Get-PropertyValue $Node 'id' 'Node'))
+    if ($shapeKind -eq 'diamond') {
+        $shape.Text = ''
+        $label = $Page.DrawRectangle($x - $width / 3, $y - $height / 5, $x + $width / 3, $y + $height / 5)
+        $label.Text = $displayText
+        Set-ShapeStyle $label ([pscustomobject]@{
+            fill = 'none'
+            line = 'none'
+            font = [string] (Get-PropertyValue $Node 'font' 'Arial')
+            fontSize = [string] (Get-PropertyValue $Node 'fontSize' '10 pt')
+            fontColor = [string] (Get-PropertyValue $Node 'fontColor' 'RGB(0, 0, 0)')
+        })
+    } else {
+        $shape.Text = $displayText
+    }
     Set-ShapeStyle $shape $Node
 
     return [pscustomobject]@{
@@ -163,6 +190,7 @@ function Add-Link {
     $line = $Page.DrawLine($p1.X, $p1.Y, $p2.X, $p2.Y)
     $line.CellsU('LineColor').FormulaU = [string] (Get-PropertyValue $Link 'line' 'RGB(80, 80, 80)')
     $line.CellsU('LineWeight').FormulaU = [string] (Get-PropertyValue $Link 'lineWeight' '1.25 pt')
+    $line.CellsU('LinePattern').FormulaU = [string] (Get-PropertyValue $Link 'linePattern' '1')
 
     $style = [string] (Get-PropertyValue $Link 'style' 'arrow')
     if ($style -ne 'line') {
@@ -171,9 +199,19 @@ function Add-Link {
 
     $text = [string] (Get-PropertyValue $Link 'text' '')
     if ($text.Length -gt 0) {
-        $line.Text = $text
-        $line.CellsU('Char.Size').FormulaU = [string] (Get-PropertyValue $Link 'fontSize' '8 pt')
-        $line.CellsU('Char.Font').FormulaU = "FONT(`"$([string] (Get-PropertyValue $Link 'font' 'Arial'))`")"
+        $midX = ($p1.X + $p2.X) / 2
+        $midY = ($p1.Y + $p2.Y) / 2
+        $labelWidth = [double] (Get-PropertyValue $Link 'labelWidth' 0.5)
+        $labelHeight = [double] (Get-PropertyValue $Link 'labelHeight' 0.22)
+        $label = $Page.DrawRectangle($midX - $labelWidth / 2, $midY - $labelHeight / 2, $midX + $labelWidth / 2, $midY + $labelHeight / 2)
+        $label.Text = $text
+        Set-ShapeStyle $label ([pscustomobject]@{
+            fill = 'none'
+            line = 'none'
+            font = [string] (Get-PropertyValue $Link 'font' 'Arial')
+            fontSize = [string] (Get-PropertyValue $Link 'fontSize' '8 pt')
+            fontColor = [string] (Get-PropertyValue $Link 'fontColor' 'RGB(0, 0, 0)')
+        })
     }
 
     return $line
@@ -190,6 +228,7 @@ function Add-Arrow {
     $line = $Page.DrawLine($x1, $y1, $x2, $y2)
     $line.CellsU('LineColor').FormulaU = [string] (Get-PropertyValue $Arrow 'line' 'RGB(0, 0, 0)')
     $line.CellsU('LineWeight').FormulaU = [string] (Get-PropertyValue $Arrow 'lineWeight' '1.5 pt')
+    $line.CellsU('LinePattern').FormulaU = [string] (Get-PropertyValue $Arrow 'linePattern' '1')
 
     $style = [string] (Get-PropertyValue $Arrow 'style' 'arrow')
     if ($style -ne 'line') {
@@ -201,9 +240,19 @@ function Add-Arrow {
 
     $text = [string] (Get-PropertyValue $Arrow 'text' '')
     if ($text.Length -gt 0) {
-        $line.Text = $text
-        $line.CellsU('Char.Size').FormulaU = [string] (Get-PropertyValue $Arrow 'fontSize' '8 pt')
-        $line.CellsU('Char.Font').FormulaU = "FONT(`"$([string] (Get-PropertyValue $Arrow 'font' 'Arial'))`")"
+        $midX = ($x1 + $x2) / 2
+        $midY = ($y1 + $y2) / 2
+        $labelWidth = [double] (Get-PropertyValue $Arrow 'labelWidth' 0.5)
+        $labelHeight = [double] (Get-PropertyValue $Arrow 'labelHeight' 0.22)
+        $label = $Page.DrawRectangle($midX - $labelWidth / 2, $midY - $labelHeight / 2, $midX + $labelWidth / 2, $midY + $labelHeight / 2)
+        $label.Text = $text
+        Set-ShapeStyle $label ([pscustomobject]@{
+            fill = 'none'
+            line = 'none'
+            font = [string] (Get-PropertyValue $Arrow 'font' 'Arial')
+            fontSize = [string] (Get-PropertyValue $Arrow 'fontSize' '8 pt')
+            fontColor = [string] (Get-PropertyValue $Arrow 'fontColor' 'RGB(0, 0, 0)')
+        })
     }
 
     return $line
@@ -268,7 +317,7 @@ if ($SpecPath) {
     if (-not (Test-Path -LiteralPath $SpecPath)) {
         throw "SpecPath does not exist: $SpecPath"
     }
-    $spec = Get-Content -Raw -LiteralPath $SpecPath | ConvertFrom-Json
+    $spec = Get-Content -Raw -Encoding UTF8 -LiteralPath $SpecPath | ConvertFrom-Json
 } else {
     $spec = Get-DefaultSpec
 }

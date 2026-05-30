@@ -1,0 +1,40 @@
+{
+  "page": { "name": "Memory Streams", "width": 15, "height": 6 },
+  "nodes": [
+    { "id": "trace1", "text": "", "x": 0.75, "y": 3.05, "width": 1.05, "height": 1.5, "fill": "RGB(220,220,220)", "line": "RGB(80,80,80)", "rounding": "0.02 in", "layerCopies": 2, "copyOffsetX": -0.12, "copyOffsetY": 0.12 },
+    { "id": "generator", "text": "CPU", "x": 3.0, "y": 3.15, "width": 1.5, "height": 1.3, "fill": "RGB(130,180,215)", "line": "RGB(80,110,130)", "lineWeight": "2 pt", "fontSize": "18 pt", "fontColor": "RGB(80,110,130)" },
+    { "id": "cand1", "text": "Doc", "x": 4.65, "y": 3.85, "width": 0.42, "height": 0.55, "fill": "RGB(140,190,225)", "line": "RGB(80,120,150)", "fontSize": "7 pt" },
+    { "id": "cand2", "text": "Doc", "x": 4.65, "y": 3.15, "width": 0.42, "height": 0.55, "fill": "RGB(140,190,225)", "line": "RGB(80,120,150)", "fontSize": "7 pt" },
+    { "id": "cand3", "text": "Doc", "x": 4.65, "y": 2.45, "width": 0.42, "height": 0.55, "fill": "RGB(140,190,225)", "line": "RGB(80,120,150)", "fontSize": "7 pt" },
+    { "id": "selector", "text": "Filter", "x": 6.2, "y": 3.15, "width": 1.2, "height": 1.15, "fill": "RGB(130,180,215)", "line": "RGB(80,110,130)", "lineWeight": "2 pt", "fontSize": "14 pt", "fontColor": "RGB(80,110,130)" },
+    { "id": "classifier", "text": "Classifier", "shape": "diamond", "x": 8.05, "y": 3.15, "width": 1.25, "height": 1.25, "fill": "RGB(130,180,215)", "line": "RGB(80,110,130)", "lineWeight": "2 pt", "fontSize": "12 pt" },
+    { "id": "tactical", "text": "Tactical\nMemory", "x": 10.6, "y": 4.65, "width": 2.2, "height": 1.25, "fill": "RGB(238,130,105)", "line": "RGB(200,95,70)", "lineWeight": "3 pt", "fontSize": "13 pt" },
+    { "id": "strategic", "text": "Optimize\n\nStrategic\nMemory", "shape": "ellipse", "x": 10.8, "y": 2.0, "width": 2.0, "height": 1.35, "fill": "RGB(135,190,225)", "line": "RGB(70,110,135)", "lineWeight": "3 pt", "fontSize": "13 pt" },
+    { "id": "prompt", "text": "Optimized\nPrompt", "x": 13.75, "y": 3.15, "width": 1.25, "height": 1.65, "fill": "RGB(220,220,220)", "line": "RGB(80,80,80)", "lineWeight": "3 pt", "rounding": "0.03 in", "fontSize": "18 pt" }
+  ],
+  "labels": [
+    { "text": "Execution\nTrace", "x": 0.75, "y": 4.75, "width": 1.2, "height": 0.5, "fontSize": "13 pt" },
+    { "text": "Synthesis & Selection", "x": 5.0, "y": 5.55, "width": 2.2, "height": 0.3, "fontSize": "13 pt", "font": "Times New Roman" },
+    { "text": "Guideline\nGenerator", "x": 3.0, "y": 4.75, "width": 1.35, "height": 0.5, "fontSize": "13 pt", "font": "Times New Roman" },
+    { "text": "Candidates", "x": 4.65, "y": 4.85, "width": 1.0, "height": 0.25, "fontSize": "12 pt" },
+    { "text": "Best-of-N\nSelector", "x": 6.2, "y": 4.85, "width": 1.25, "height": 0.5, "fontSize": "12 pt", "font": "Times New Roman" },
+    { "text": "Optimal\nGuideline", "x": 6.2, "y": 1.3, "width": 1.2, "height": 0.5, "fontSize": "12 pt" },
+    { "text": "Tactical Stream", "x": 10.6, "y": 5.65, "width": 1.5, "height": 0.25, "fontSize": "13 pt", "font": "Times New Roman" },
+    { "text": "Optimizer", "x": 9.65, "y": 3.15, "width": 0.85, "height": 0.25, "fontSize": "11 pt" },
+    { "text": "Strategic Stream", "x": 10.8, "y": 0.45, "width": 1.7, "height": 0.3, "fontSize": "13 pt", "font": "Times New Roman" }
+  ],
+  "arrows": [
+    { "x1": 1.28, "y1": 3.15, "x2": 2.25, "y2": 3.15, "lineWeight": "3 pt" },
+    { "x1": 3.75, "y1": 3.15, "x2": 4.3, "y2": 3.15, "lineWeight": "2.4 pt" },
+    { "x1": 3.75, "y1": 3.45, "x2": 4.3, "y2": 3.85, "lineWeight": "2.0 pt" },
+    { "x1": 3.75, "y1": 2.85, "x2": 4.3, "y2": 2.45, "lineWeight": "2.0 pt" },
+    { "x1": 5.0, "y1": 3.15, "x2": 5.65, "y2": 3.15, "lineWeight": "2.4 pt" },
+    { "x1": 5.0, "y1": 3.85, "x2": 5.65, "y2": 3.45, "lineWeight": "2.0 pt" },
+    { "x1": 5.0, "y1": 2.45, "x2": 5.65, "y2": 2.85, "lineWeight": "2.0 pt" },
+    { "x1": 6.8, "y1": 3.15, "x2": 7.35, "y2": 3.15, "lineWeight": "3 pt" },
+    { "x1": 8.68, "y1": 4.0, "x2": 9.3, "y2": 4.75, "lineWeight": "3 pt", "linePattern": "2" },
+    { "x1": 8.05, "y1": 2.55, "x2": 9.6, "y2": 2.0, "lineWeight": "3 pt" },
+    { "x1": 11.7, "y1": 4.65, "x2": 12.65, "y2": 3.45, "lineWeight": "3 pt", "linePattern": "2" },
+    { "x1": 11.75, "y1": 2.0, "x2": 13.1, "y2": 2.85, "lineWeight": "3 pt" }
+  ]
+}
