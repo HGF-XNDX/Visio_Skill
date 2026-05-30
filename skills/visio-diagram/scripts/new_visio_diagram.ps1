@@ -1,8 +1,9 @@
 ﻿param(
     [string] $SpecPath,
-    [string] $OutputPath = (Join-Path (Get-Location) 'visio-diagram.vsdx'),
+    [string] $OutputPath,
     [switch] $Open,
     [switch] $NoOpen,
+    [switch] $Save,
     [switch] $Force,
     [switch] $Json
 )
@@ -873,16 +874,25 @@ if ($SpecPath) {
     $spec = Get-DefaultSpec
 }
 
-$resolvedOutput = [System.IO.Path]::GetFullPath($OutputPath)
-$outputDirectory = Split-Path -Parent $resolvedOutput
-if ($outputDirectory -and -not (Test-Path -LiteralPath $outputDirectory)) {
-    New-Item -ItemType Directory -Path $outputDirectory | Out-Null
-}
-if ((Test-Path -LiteralPath $resolvedOutput) -and -not $Force) {
-    throw "OutputPath already exists: $resolvedOutput. Re-run with -Force only after overwrite is approved."
-}
-
 $keepOpen = [bool] $Open -or -not [bool] $NoOpen
+$hasOutputPath = -not [string]::IsNullOrWhiteSpace($OutputPath)
+$shouldSave = [bool] $Save -or [bool] $NoOpen -or $hasOutputPath
+$resolvedOutput = $null
+
+if ($shouldSave) {
+    if (-not $hasOutputPath) {
+        $OutputPath = Join-Path (Get-Location) 'visio-diagram.vsdx'
+    }
+
+    $resolvedOutput = [System.IO.Path]::GetFullPath($OutputPath)
+    $outputDirectory = Split-Path -Parent $resolvedOutput
+    if ($outputDirectory -and -not (Test-Path -LiteralPath $outputDirectory)) {
+        New-Item -ItemType Directory -Path $outputDirectory | Out-Null
+    }
+    if ((Test-Path -LiteralPath $resolvedOutput) -and -not $Force) {
+        throw "OutputPath already exists: $resolvedOutput. Re-run with -Force only after overwrite is approved."
+    }
+}
 
 try {
     $visio = [Runtime.InteropServices.Marshal]::GetActiveObject('Visio.Application')
@@ -972,7 +982,9 @@ foreach ($note in @(Get-PropertyValue $spec 'notes' @())) {
     Add-Note $page $note
 }
 
-$null = $doc.SaveAs($resolvedOutput)
+if ($shouldSave) {
+    $null = $doc.SaveAs($resolvedOutput)
+}
 
 if ($keepOpen) {
     $visio.ActiveWindow.Page = $page
@@ -980,6 +992,7 @@ if ($keepOpen) {
 
 $result = [pscustomobject]@{
     OutputPath = $resolvedOutput
+    Saved = $shouldSave
     Document = $doc.Name
     Page = $page.Name
     ShapeCount = $page.Shapes.Count

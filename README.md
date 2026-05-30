@@ -49,12 +49,12 @@ After installation, ask Codex to use `$visio-diagram`.
 From the repository root:
 
 ```powershell
-PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -Json
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1
 ```
 
-By default, the generated file is opened and left visible in Visio so the user can inspect, edit, or save it from Visio.
+By default, the generated diagram is opened as an unsaved Visio document so the user can inspect, edit, and choose how to save it from Visio.
 
-Use `-NoOpen` for automated smoke tests or batch generation:
+Use `-OutputPath` when the script should save a `.vsdx`, and use `-NoOpen` for automated smoke tests or batch generation:
 
 ```powershell
 PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -NoOpen -Json
@@ -74,5 +74,6 @@ Save it as paper-method.vsdx.
 
 - Generated files are editable in Visio.
 - Existing output files are not overwritten unless the script is run with `-Force`.
-- By default, the script leaves Visio open for user review. Use `-NoOpen` to save and close automatically.
+- By default, the script leaves Visio open and does not save a file; the user saves from Visio.
+- Use `-OutputPath`, `-Save`, or `-NoOpen` only when the script should write a `.vsdx`.
 - The script does not run Visio macros.

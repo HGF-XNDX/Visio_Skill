@@ -49,12 +49,12 @@ https://github.com/HGF-XNDX/Codex_Visio_Skill
 在仓库根目录执行：
 
 ```powershell
-PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -Json
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1
 ```
 
-默认情况下，生成后的文件会在 Visio 中打开并保持可见，用户可以直接检查、编辑或从 Visio 里保存。
+默认情况下，生成后的图会作为未保存的 Visio 文档打开，用户可以直接检查、编辑，并自己决定如何保存。
 
-如果是自动化冒烟测试或批量生成，不希望留下 Visio 窗口，可以加 `-NoOpen`：
+如果希望脚本直接写出 `.vsdx`，可以传 `-OutputPath`；如果是自动化冒烟测试或批量生成，不希望留下 Visio 窗口，可以加 `-NoOpen`：
 
 ```powershell
 PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -NoOpen -Json
@@ -74,5 +74,6 @@ D_train 圆柱体，以及虚线 sample 连接线。
 
 - 生成的文件可以在 Visio 中继续编辑。
 - 如果目标文件已经存在，脚本默认不会覆盖；确认需要覆盖时才使用 `-Force`。
-- 默认会打开并保留 Visio 窗口供用户检查；需要自动保存并关闭时使用 `-NoOpen`。
+- 默认会打开并保留 Visio 窗口，而且不保存文件；用户从 Visio 中自行保存。
+- 只有希望脚本写出 `.vsdx` 时才使用 `-OutputPath`、`-Save` 或 `-NoOpen`。
 - 脚本不会运行 Visio 宏。
