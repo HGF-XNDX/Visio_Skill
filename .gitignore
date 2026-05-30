@@ -1,4 +1,5 @@
 *.vsdx
+figure-tests/*.png
 ~$*
 *.tmp
 .DS_Store
