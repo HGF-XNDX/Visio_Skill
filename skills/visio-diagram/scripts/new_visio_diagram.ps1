@@ -281,6 +281,174 @@ function Add-Label {
     return $shape
 }
 
+function Add-Table {
+    param($Page, $Table)
+
+    $x = [double] (Get-PropertyValue $Table 'x' 1)
+    $y = [double] (Get-PropertyValue $Table 'y' 1)
+    $width = [double] (Get-PropertyValue $Table 'width' 2)
+    $height = [double] (Get-PropertyValue $Table 'height' 1)
+    $rows = @(Get-PropertyValue $Table 'rows' @())
+    if ($rows.Count -eq 0) { return }
+
+    $rowCount = $rows.Count
+    $colCount = 0
+    foreach ($row in $rows) {
+        $colCount = [Math]::Max($colCount, @($row).Count)
+    }
+    if ($colCount -eq 0) { return }
+
+    $cellWidth = $width / $colCount
+    $cellHeight = $height / $rowCount
+    $left = $x - $width / 2
+    $top = $y + $height / 2
+    $headerRows = [int] (Get-PropertyValue $Table 'headerRows' 0)
+    $fill = [string] (Get-PropertyValue $Table 'fill' 'RGB(255,255,255)')
+    $headerFill = [string] (Get-PropertyValue $Table 'headerFill' 'RGB(245,247,250)')
+    $line = [string] (Get-PropertyValue $Table 'line' 'RGB(140,140,140)')
+    $fontSize = [string] (Get-PropertyValue $Table 'fontSize' '9 pt')
+    $font = [string] (Get-PropertyValue $Table 'font' 'Arial')
+
+    for ($r = 0; $r -lt $rowCount; $r += 1) {
+        $row = @($rows[$r])
+        for ($c = 0; $c -lt $colCount; $c += 1) {
+            $cellLeft = $left + $c * $cellWidth
+            $cellTop = $top - $r * $cellHeight
+            $shape = $Page.DrawRectangle($cellLeft, $cellTop - $cellHeight, $cellLeft + $cellWidth, $cellTop)
+            $shape.Text = if ($c -lt $row.Count) { [string] $row[$c] } else { '' }
+            Set-ShapeStyle $shape ([pscustomobject]@{
+                fill = if ($r -lt $headerRows) { $headerFill } else { $fill }
+                line = $line
+                lineWeight = [string] (Get-PropertyValue $Table 'lineWeight' '0.75 pt')
+                font = $font
+                fontSize = $fontSize
+                fontColor = [string] (Get-PropertyValue $Table 'fontColor' 'RGB(0,0,0)')
+            })
+        }
+    }
+}
+
+function Add-Tree {
+    param($Page, $Tree)
+
+    $nodes = @(Get-PropertyValue $Tree 'nodes' @())
+    $edges = @(Get-PropertyValue $Tree 'edges' @())
+    $treeNodeMap = @{}
+
+    foreach ($node in $nodes) {
+        $created = Add-Node $Page ([pscustomobject]@{
+            id = [string] (Get-PropertyValue $node 'id' '')
+            text = [string] (Get-PropertyValue $node 'text' '')
+            shape = [string] (Get-PropertyValue $node 'shape' 'circle')
+            x = [double] (Get-PropertyValue $node 'x' 1)
+            y = [double] (Get-PropertyValue $node 'y' 1)
+            width = [double] (Get-PropertyValue $node 'width' 0.42)
+            height = [double] (Get-PropertyValue $node 'height' 0.42)
+            fill = [string] (Get-PropertyValue $node 'fill' 'RGB(255,255,255)')
+            line = [string] (Get-PropertyValue $node 'line' 'RGB(100,100,100)')
+            fontSize = [string] (Get-PropertyValue $node 'fontSize' '8 pt')
+        })
+        if ($created.Id.Length -gt 0) {
+            $treeNodeMap[$created.Id] = $created
+        }
+    }
+
+    foreach ($edge in $edges) {
+        Add-Link $Page $edge $treeNodeMap | Out-Null
+    }
+}
+
+function Add-BarChart {
+    param($Page, $Chart)
+
+    $x = [double] (Get-PropertyValue $Chart 'x' 1)
+    $y = [double] (Get-PropertyValue $Chart 'y' 1)
+    $width = [double] (Get-PropertyValue $Chart 'width' 2)
+    $height = [double] (Get-PropertyValue $Chart 'height' 1)
+    $bars = @(Get-PropertyValue $Chart 'bars' @())
+    if ($bars.Count -eq 0) { return }
+
+    $panel = $Page.DrawRectangle($x - $width / 2, $y - $height / 2, $x + $width / 2, $y + $height / 2)
+    $panel.Text = [string] (Get-PropertyValue $Chart 'title' '')
+    Set-ShapeStyle $panel ([pscustomobject]@{
+        fill = [string] (Get-PropertyValue $Chart 'fill' 'RGB(255,255,255)')
+        line = [string] (Get-PropertyValue $Chart 'line' 'RGB(180,180,180)')
+        fontSize = [string] (Get-PropertyValue $Chart 'titleFontSize' '8 pt')
+        vAlign = '0'
+    })
+
+    $maxValue = [double] (Get-PropertyValue $Chart 'maxValue' 0)
+    if ($maxValue -le 0) {
+        foreach ($bar in $bars) {
+            $maxValue = [Math]::Max($maxValue, [double] (Get-PropertyValue $bar 'value' 0))
+        }
+    }
+    if ($maxValue -le 0) { $maxValue = 1 }
+
+    $plotLeft = $x - $width / 2 + 0.25
+    $plotBottom = $y - $height / 2 + 0.28
+    $plotWidth = $width - 0.45
+    $plotHeight = $height - 0.62
+    $gap = $plotWidth / ($bars.Count * 2 + 1)
+    $barWidth = $gap
+
+    Add-Arrow $Page ([pscustomobject]@{ x1 = $plotLeft; y1 = $plotBottom; x2 = $plotLeft + $plotWidth; y2 = $plotBottom; style = 'line'; lineWeight = '0.7 pt' }) | Out-Null
+    Add-Arrow $Page ([pscustomobject]@{ x1 = $plotLeft; y1 = $plotBottom; x2 = $plotLeft; y2 = $plotBottom + $plotHeight; style = 'line'; lineWeight = '0.7 pt' }) | Out-Null
+
+    for ($i = 0; $i -lt $bars.Count; $i += 1) {
+        $bar = $bars[$i]
+        $value = [double] (Get-PropertyValue $bar 'value' 0)
+        $barHeight = $plotHeight * $value / $maxValue
+        $barLeft = $plotLeft + $gap + $i * 2 * $gap
+        $barShape = $Page.DrawRectangle($barLeft, $plotBottom, $barLeft + $barWidth, $plotBottom + $barHeight)
+        $barShape.Text = ''
+        Set-ShapeStyle $barShape ([pscustomobject]@{
+            fill = [string] (Get-PropertyValue $bar 'fill' 'RGB(220,230,245)')
+            line = [string] (Get-PropertyValue $bar 'line' 'RGB(120,120,120)')
+            fontSize = '1 pt'
+        })
+        Add-Label $Page ([pscustomobject]@{
+            text = [string] (Get-PropertyValue $bar 'text' $value)
+            x = $barLeft + $barWidth / 2
+            y = $plotBottom + $barHeight + 0.08
+            width = 0.42
+            height = 0.15
+            fontSize = [string] (Get-PropertyValue $Chart 'valueFontSize' '5 pt')
+        }) | Out-Null
+        Add-Label $Page ([pscustomobject]@{
+            text = [string] (Get-PropertyValue $bar 'label' '')
+            x = $barLeft + $barWidth / 2
+            y = $plotBottom - 0.12
+            width = 0.48
+            height = 0.16
+            fontSize = [string] (Get-PropertyValue $Chart 'labelFontSize' '5 pt')
+        }) | Out-Null
+    }
+}
+
+function Add-ElbowConnector {
+    param($Page, $Connector)
+
+    $points = @(Get-PropertyValue $Connector 'points' @())
+    if ($points.Count -lt 2) { return }
+
+    for ($i = 0; $i -lt $points.Count - 1; $i += 1) {
+        $p1 = $points[$i]
+        $p2 = $points[$i + 1]
+        $segment = [pscustomobject]@{
+            x1 = [double] (Get-PropertyValue $p1 'x' 0)
+            y1 = [double] (Get-PropertyValue $p1 'y' 0)
+            x2 = [double] (Get-PropertyValue $p2 'x' 0)
+            y2 = [double] (Get-PropertyValue $p2 'y' 0)
+            style = if ($i -eq $points.Count - 2) { [string] (Get-PropertyValue $Connector 'style' 'arrow') } else { 'line' }
+            line = [string] (Get-PropertyValue $Connector 'line' 'RGB(0,0,0)')
+            lineWeight = [string] (Get-PropertyValue $Connector 'lineWeight' '1.25 pt')
+            linePattern = [string] (Get-PropertyValue $Connector 'linePattern' '1')
+        }
+        Add-Arrow $Page $segment | Out-Null
+    }
+}
+
 function Add-Title {
     param($Page, [string] $Title, [double] $PageWidth, [double] $PageHeight)
 
@@ -361,8 +529,24 @@ foreach ($node in @(Get-PropertyValue $spec 'nodes' @())) {
     $nodeMap[$created.Id] = $created
 }
 
+foreach ($table in @(Get-PropertyValue $spec 'tables' @())) {
+    Add-Table $page $table
+}
+
+foreach ($tree in @(Get-PropertyValue $spec 'trees' @())) {
+    Add-Tree $page $tree
+}
+
+foreach ($chart in @(Get-PropertyValue $spec 'barCharts' @())) {
+    Add-BarChart $page $chart
+}
+
 foreach ($link in @(Get-PropertyValue $spec 'links' @())) {
     Add-Link $page $link $nodeMap | Out-Null
+}
+
+foreach ($connector in @(Get-PropertyValue $spec 'elbowConnectors' @())) {
+    Add-ElbowConnector $page $connector
 }
 
 foreach ($arrow in @(Get-PropertyValue $spec 'arrows' @())) {

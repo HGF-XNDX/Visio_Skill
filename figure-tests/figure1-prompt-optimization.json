@@ -9,7 +9,7 @@
     { "id": "p2", "text": "P2", "shape": "circle", "x": 3.55, "y": 5.35, "width": 0.42, "height": 0.42, "fill": "RGB(255,255,255)", "line": "RGB(80,80,80)", "fontSize": "8 pt" },
     { "id": "p3", "text": "P3", "shape": "circle", "x": 0.8, "y": 4.85, "width": 0.42, "height": 0.42, "fill": "RGB(255,255,255)", "line": "RGB(80,80,80)", "fontSize": "8 pt" },
     { "id": "p4", "text": "P4", "shape": "circle", "x": 2.0, "y": 4.85, "width": 0.42, "height": 0.42, "fill": "RGB(255,255,255)", "line": "RGB(80,80,80)", "fontSize": "8 pt" },
-    { "id": "matrix", "text": "Scores Matrix", "x": 2.0, "y": 2.85, "width": 3.0, "height": 1.95, "fill": "RGB(252,255,245)", "line": "RGB(190,210,130)", "rounding": "0 in", "fontSize": "16 pt", "vAlign": "2" },
+    { "id": "matrix", "text": "", "x": 2.0, "y": 2.85, "width": 3.0, "height": 1.95, "fill": "none", "line": "none", "rounding": "0 in", "fontSize": "16 pt", "vAlign": "2" },
     { "id": "best", "text": "Best candidate\nper task", "x": 5.25, "y": 2.95, "width": 1.45, "height": 1.9, "fill": "RGB(255,255,255)", "line": "RGB(80,80,80)", "rounding": "0 in", "fontSize": "10 pt" },
     { "id": "filtered", "text": "Filtered Pool (Pareto Frontier)", "x": 8.6, "y": 2.95, "width": 3.0, "height": 1.9, "fill": "RGB(255,255,255)", "line": "RGB(80,80,80)", "rounding": "0 in", "fontSize": "11 pt" },
     { "id": "dtrain", "text": "Dtrain", "x": 5.25, "y": 4.55, "width": 1.35, "height": 0.9, "fill": "RGB(255,255,255)", "line": "RGB(120,120,120)", "rounding": "0.15 in", "fontSize": "11 pt" },
@@ -23,21 +23,55 @@
     { "id": "merge", "text": "System Aware\nMerge", "x": 14.0, "y": 5.5, "width": 1.9, "height": 2.25, "fill": "RGB(255,255,255)", "line": "RGB(120,120,120)", "fontSize": "10 pt", "vAlign": "0" },
     { "id": "choose", "text": "Choose Strategy to create new candidate", "x": 12.85, "y": 1.45, "width": 4.9, "height": 0.38, "fill": "none", "line": "none", "fontSize": "11 pt" }
   ],
+  "tables": [
+    {
+      "x": 2.0,
+      "y": 2.7,
+      "width": 3.0,
+      "height": 1.7,
+      "headerRows": 1,
+      "headerFill": "RGB(190,225,65)",
+      "fill": "RGB(252,255,245)",
+      "line": "RGB(190,210,130)",
+      "fontSize": "8 pt",
+      "rows": [
+        ["", "P3", "P1", "P4", "P0", "P2"],
+        ["Task 1", "OK", "X", "X", "X", "X"],
+        ["Task 2", "X", "OK", "X", "X", "OK"],
+        ["Task 3", "X", "X", "X", "X", "OK"],
+        ["...", "", "", "", "", ""],
+        ["Scores Matrix", "", "", "", "", ""]
+      ]
+    },
+    {
+      "x": 11.75,
+      "y": 5.05,
+      "width": 1.65,
+      "height": 1.1,
+      "fill": "RGB(255,255,255)",
+      "line": "RGB(80,80,80)",
+      "fontSize": "8 pt",
+      "rows": [
+        ["Reflect and\nPropose New\nPrompt"],
+        ["Obtain text\nfeedbacks using Pf"],
+        ["Rollouts:\nExecute P2 on M"]
+      ]
+    },
+    {
+      "x": 14.0,
+      "y": 5.05,
+      "width": 1.65,
+      "height": 1.3,
+      "fill": "RGB(255,255,255)",
+      "line": "RGB(80,80,80)",
+      "fontSize": "7 pt",
+      "rows": [
+        ["Strategically select\nprompt for each\nmodule, either\nfrom P2 or P3."],
+        ["If a module evolved\nin P2 but not in P3,\nselect from P2 and\nvice-versa."]
+      ]
+    }
+  ],
   "labels": [
-    { "text": "Task 1", "x": 0.25, "y": 3.25, "width": 0.55, "height": 0.25, "fontSize": "9 pt" },
-    { "text": "Task 2", "x": 0.25, "y": 2.65, "width": 0.55, "height": 0.25, "fontSize": "9 pt" },
-    { "text": "Task 3", "x": 0.25, "y": 2.05, "width": 0.55, "height": 0.25, "fontSize": "9 pt" },
-    { "text": "OK", "x": 0.8, "y": 3.25, "width": 0.35, "height": 0.35, "fontSize": "10 pt", "fontColor": "RGB(0,185,45)" },
-    { "text": "X", "x": 1.35, "y": 3.25, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "X", "x": 2.0, "y": 3.25, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "X", "x": 2.65, "y": 3.25, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "X", "x": 3.35, "y": 3.25, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "X", "x": 0.8, "y": 2.65, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "OK", "x": 1.35, "y": 2.65, "width": 0.35, "height": 0.35, "fontSize": "10 pt", "fontColor": "RGB(0,185,45)" },
-    { "text": "OK", "x": 3.35, "y": 2.65, "width": 0.35, "height": 0.35, "fontSize": "10 pt", "fontColor": "RGB(0,185,45)" },
-    { "text": "X", "x": 0.8, "y": 2.05, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "X", "x": 1.35, "y": 2.05, "width": 0.35, "height": 0.35, "fontSize": "16 pt", "fontColor": "RGB(230,0,0)" },
-    { "text": "OK", "x": 3.35, "y": 2.05, "width": 0.35, "height": 0.35, "fontSize": "10 pt", "fontColor": "RGB(0,185,45)" },
     { "text": "Sample", "x": 8.6, "y": 4.25, "width": 0.75, "height": 0.25, "fontSize": "10 pt" },
     { "text": "Pareto-based Candidate Filtering", "x": 7.35, "y": 0.75, "width": 4.6, "height": 0.35, "fontSize": "12 pt", "fill": "RGB(255,247,216)", "line": "RGB(230,200,95)" }
   ],

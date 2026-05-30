@@ -52,6 +52,10 @@ Use `references/spec-format.md` for the JSON schema and examples. Keep generated
 - `links`: connectors using `from`, `to`, optional `text`, `style`.
 - `arrows`: explicit coordinate arrows for academic figures or non-graph layouts.
 - `labels`: free-positioned text labels with no border/fill by default.
+- `tables`: grid layouts for score matrices, module descriptions, and compact comparison panels.
+- `trees`: small node-edge subgraphs inside larger figures.
+- `barCharts`: compact performance charts for paper overview figures.
+- `elbowConnectors`: routed multi-segment connectors when straight lines cross important content.
 - `groups` or advanced Visio masters are not required unless the user asks.
 
 Coordinates are in Visio inches. The origin is bottom-left. A good default page is 11 by 8.5 inches.
@@ -70,6 +74,9 @@ For paper-figure recreation or reference-image style diagrams:
 - Use explicit `x`, `y`, `width`, and `height` for every shape; do not rely on auto layout.
 - Use `arrows` for precise vertical or diagonal arrows instead of `links` when the figure is not a simple graph.
 - Use `labels` for annotations such as "Dense Layer" or "Most Effective!" instead of encoding them as nodes.
+- Use `tables` for score matrices, right-side method-detail boxes, and other dense rectangular content.
+- Use `barCharts` for small metric panels instead of drawing bars manually.
+- Use `elbowConnectors` when a connector must route around a panel.
 - Use `layerCopies`, `copyOffsetX`, and `copyOffsetY` for stacked blocks or repeated translucent circles.
 - Keep the page close to the target aspect ratio. For square source figures, prefer an 8 by 8 inch page.
 - Set `font: "Arial"` and explicit `fontSize` values for readable output.

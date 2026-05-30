@@ -34,6 +34,56 @@
     { "id": "chart2", "text": "Performance on WebQSP", "x": 14.3, "y": 3.25, "width": 2.7, "height": 1.15, "fill": "RGB(255,255,255)", "line": "RGB(180,180,180)", "rounding": "0 in", "fontSize": "8 pt", "vAlign": "0" },
     { "id": "chart3", "text": "Performance on GraphQ", "x": 14.3, "y": 1.5, "width": 2.7, "height": 1.15, "fill": "RGB(255,255,255)", "line": "RGB(180,180,180)", "rounding": "0 in", "fontSize": "8 pt", "vAlign": "0" }
   ],
+  "barCharts": [
+    {
+      "title": "Performance on GrailQA",
+      "x": 14.3,
+      "y": 5.0,
+      "width": 2.7,
+      "height": 1.15,
+      "maxValue": 100,
+      "bars": [
+        { "label": "RG", "value": 38.9, "fill": "RGB(252,230,205)" },
+        { "label": "GR", "value": 37.4, "fill": "RGB(252,230,205)" },
+        { "label": "CoT", "value": 40.1, "fill": "RGB(218,238,216)" },
+        { "label": "ToT", "value": 46.0, "fill": "RGB(218,238,216)" },
+        { "label": "MCTS", "value": 63.9, "fill": "RGB(232,218,236)" },
+        { "label": "KBQA", "value": 78.5, "fill": "RGB(232,218,236)" }
+      ]
+    },
+    {
+      "title": "Performance on WebQSP",
+      "x": 14.3,
+      "y": 3.25,
+      "width": 2.7,
+      "height": 1.15,
+      "maxValue": 100,
+      "bars": [
+        { "label": "RG", "value": 45.9, "fill": "RGB(252,230,205)" },
+        { "label": "GR", "value": 50.3, "fill": "RGB(252,230,205)" },
+        { "label": "CoT", "value": 44.6, "fill": "RGB(218,238,216)" },
+        { "label": "ToT", "value": 47.1, "fill": "RGB(218,238,216)" },
+        { "label": "MCTS", "value": 55.4, "fill": "RGB(232,218,236)" },
+        { "label": "KBQA", "value": 59.8, "fill": "RGB(232,218,236)" }
+      ]
+    },
+    {
+      "title": "Performance on GraphQ",
+      "x": 14.3,
+      "y": 1.5,
+      "width": 2.7,
+      "height": 1.15,
+      "maxValue": 100,
+      "bars": [
+        { "label": "RG", "value": 29.3, "fill": "RGB(252,230,205)" },
+        { "label": "GR", "value": 27.1, "fill": "RGB(252,230,205)" },
+        { "label": "CoT", "value": 31.4, "fill": "RGB(218,238,216)" },
+        { "label": "ToT", "value": 37.7, "fill": "RGB(218,238,216)" },
+        { "label": "MCTS", "value": 43.9, "fill": "RGB(232,218,236)" },
+        { "label": "KBQA", "value": 48.7, "fill": "RGB(232,218,236)" }
+      ]
+    }
+  ],
   "labels": [
     { "text": "Retrieve-then-Generate", "x": 1.15, "y": 0.55, "width": 2.25, "height": 0.25, "fill": "RGB(252,230,205)", "line": "RGB(130,130,130)", "fontSize": "10 pt" },
     { "text": "Generate-then-Retrieve", "x": 3.35, "y": 0.55, "width": 2.25, "height": 0.25, "fill": "RGB(252,230,205)", "line": "RGB(130,130,130)", "fontSize": "10 pt" },
