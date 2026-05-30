@@ -26,19 +26,21 @@ If Visio is unavailable, explain that this skill cannot render `.vsdx` locally a
 Run from the skill directory or pass absolute paths:
 
 ```powershell
-PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -OutputPath .\diagram.vsdx -Open
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -OutputPath .\diagram.vsdx
 ```
+
+By default the script opens Visio and leaves the generated diagram visible so the user can inspect, edit, or save from Visio. Use `-NoOpen` only for automated smoke tests or batch generation where no visible Visio window should remain open.
 
 Use `-Json` when command output will be parsed programmatically:
 
 ```powershell
-PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -OutputPath .\diagram.vsdx -Json
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -OutputPath .\diagram.vsdx -NoOpen -Json
 ```
 
 For a quick environment smoke test, omit `-SpecPath`; the script generates a sample diagram:
 
 ```powershell
-PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx -Open
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -OutputPath .\sample.vsdx
 ```
 
 Use `-Force` only after the user has approved overwriting the target `.vsdx`.
@@ -101,7 +103,8 @@ For paper-figure recreation or reference-image style diagrams:
 - Use only file operations, PowerShell, and the Visio COM object model.
 - Do not invoke Computer Use or any screen-based automation to operate Visio.
 - Do not verify by screenshot; verify by script output, file existence, file size, and COM-reported shape count.
-- Use `-Open` only to leave the generated file visible in Visio; it is still script-driven and does not require UI interaction.
+- The default behavior leaves the generated file visible in Visio; it is still script-driven and does not require UI interaction.
+- Use `-NoOpen` for automated verification when the document should be saved and closed without leaving a Visio window open.
 
 ## Safety
 

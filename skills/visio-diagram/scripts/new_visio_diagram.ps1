@@ -2,6 +2,7 @@
     [string] $SpecPath,
     [string] $OutputPath = (Join-Path (Get-Location) 'visio-diagram.vsdx'),
     [switch] $Open,
+    [switch] $NoOpen,
     [switch] $Force,
     [switch] $Json
 )
@@ -881,6 +882,8 @@ if ((Test-Path -LiteralPath $resolvedOutput) -and -not $Force) {
     throw "OutputPath already exists: $resolvedOutput. Re-run with -Force only after overwrite is approved."
 }
 
+$keepOpen = [bool] $Open -or -not [bool] $NoOpen
+
 try {
     $visio = [Runtime.InteropServices.Marshal]::GetActiveObject('Visio.Application')
     $createdVisio = $false
@@ -889,7 +892,7 @@ try {
     $createdVisio = $true
 }
 
-$visio.Visible = [bool] $Open
+$visio.Visible = $keepOpen
 $doc = $visio.Documents.Add('')
 $page = $visio.ActivePage
 
@@ -971,7 +974,7 @@ foreach ($note in @(Get-PropertyValue $spec 'notes' @())) {
 
 $null = $doc.SaveAs($resolvedOutput)
 
-if ($Open) {
+if ($keepOpen) {
     $visio.ActiveWindow.Page = $page
 }
 
@@ -982,7 +985,7 @@ $result = [pscustomobject]@{
     ShapeCount = $page.Shapes.Count
 }
 
-if (-not $Open) {
+if (-not $keepOpen) {
     $doc.Close()
     if ($createdVisio) {
         $visio.Quit()
