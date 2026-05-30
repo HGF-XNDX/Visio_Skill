@@ -76,6 +76,15 @@ The bundled script accepts a JSON object with this shape:
       ]
     }
   ],
+  "cylinders": [
+    {
+      "text": "Dtrain",
+      "x": 4.2,
+      "y": 3.1,
+      "width": 1.0,
+      "height": 0.7
+    }
+  ],
   "notes": [
     {
       "text": "Optional note text",
@@ -105,7 +114,8 @@ Optional fields:
 - `links[].text`, `links[].style`; use `arrow` for a directed connector or `line` for no arrow.
 - `arrows[]`: explicit coordinate arrows with `x1`, `y1`, `x2`, `y2`, optional `text`, `line`, `lineWeight`, `style`.
 - `labels[]`: free-positioned text boxes. They default to no fill and no border.
-- `tables[]`: grid tables with `rows`, `x`, `y`, `width`, `height`, optional `headerRows`, `fill`, `headerFill`, `line`, `fontSize`.
+- `tables[]`: grid tables with `rows`, `x`, `y`, `width`, `height`, optional `headerRows`, `fill`, `headerFill`, `line`, `fontSize`. Cell values may be strings or objects such as `{ "text": "✓", "fontColor": "RGB(0,185,45)", "fontSize": "18 pt" }`.
+- `cylinders[]`: dataset/database cylinders with `text`, `x`, `y`, `width`, `height`, optional `ellipseHeight`, `fill`, `line`, `fontSize`.
 - `trees[]`: small subgraphs with `nodes[]` and `edges[]`; useful for candidate pools or local tree diagrams.
 - `barCharts[]`: compact chart panels with `bars[]`, `maxValue`, title, colors, and labels.
 - `elbowConnectors[]`: multi-segment connectors with `points[]`, line styling, and arrow on the final segment.
@@ -121,7 +131,7 @@ Default colors:
 
 The script draws direct connectors between node edges based on node center positions. For complex routing or paper-style diagrams, use explicit `arrows`.
 
-Use `tables` for score matrices or detail boxes instead of manually positioning dozens of labels. Use `barCharts` for small performance panels; they are not a replacement for publication-quality statistical plotting, but are much more stable than manually drawn rectangles.
+Use `tables` for score matrices or detail boxes instead of manually positioning dozens of labels. Use styled table cells for green checks, red crosses, and highlighted headers. Use `barCharts` for small performance panels; they are not a replacement for publication-quality statistical plotting, but are much more stable than manually drawn rectangles.
 
 ## Paper-Figure Example Pattern
 

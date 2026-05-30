@@ -53,6 +53,7 @@ Use `references/spec-format.md` for the JSON schema and examples. Keep generated
 - `arrows`: explicit coordinate arrows for academic figures or non-graph layouts.
 - `labels`: free-positioned text labels with no border/fill by default.
 - `tables`: grid layouts for score matrices, module descriptions, and compact comparison panels.
+- `cylinders`: database or dataset symbols such as `Dtrain`.
 - `trees`: small node-edge subgraphs inside larger figures.
 - `barCharts`: compact performance charts for paper overview figures.
 - `elbowConnectors`: routed multi-segment connectors when straight lines cross important content.
@@ -75,6 +76,8 @@ For paper-figure recreation or reference-image style diagrams:
 - Use `arrows` for precise vertical or diagonal arrows instead of `links` when the figure is not a simple graph.
 - Use `labels` for annotations such as "Dense Layer" or "Most Effective!" instead of encoding them as nodes.
 - Use `tables` for score matrices, right-side method-detail boxes, and other dense rectangular content.
+- Use per-cell table objects (`{"text": "...", "fontColor": "...", "fontSize": "..."}`) for check/cross score matrices.
+- Use `cylinders` for datasets, databases, memory stores, or corpus icons.
 - Use `barCharts` for small metric panels instead of drawing bars manually.
 - Use `elbowConnectors` when a connector must route around a panel.
 - Use `layerCopies`, `copyOffsetX`, and `copyOffsetY` for stacked blocks or repeated translucent circles.

@@ -134,7 +134,7 @@ function Add-Node {
     $displayText = [string] (Get-PropertyValue $Node 'text' (Get-PropertyValue $Node 'id' 'Node'))
     if ($shapeKind -eq 'diamond') {
         $shape.Text = ''
-        $label = $Page.DrawRectangle($x - $width / 3, $y - $height / 5, $x + $width / 3, $y + $height / 5)
+        $label = $Page.DrawRectangle($x - $width * 0.36, $y - $height * 0.22, $x + $width * 0.36, $y + $height * 0.22)
         $label.Text = $displayText
         Set-ShapeStyle $label ([pscustomobject]@{
             fill = 'none'
@@ -312,20 +312,77 @@ function Add-Table {
     for ($r = 0; $r -lt $rowCount; $r += 1) {
         $row = @($rows[$r])
         for ($c = 0; $c -lt $colCount; $c += 1) {
+            $cellValue = if ($c -lt $row.Count) { $row[$c] } else { '' }
+            $cellText = [string] $cellValue
+            $cellFill = if ($r -lt $headerRows) { $headerFill } else { $fill }
+            $cellLine = $line
+            $cellFont = $font
+            $cellFontSize = $fontSize
+            $cellFontColor = [string] (Get-PropertyValue $Table 'fontColor' 'RGB(0,0,0)')
+            if ($null -ne $cellValue -and $null -ne $cellValue.PSObject.Properties['text']) {
+                $cellText = [string] (Get-PropertyValue $cellValue 'text' '')
+                $cellFill = [string] (Get-PropertyValue $cellValue 'fill' $cellFill)
+                $cellLine = [string] (Get-PropertyValue $cellValue 'line' $cellLine)
+                $cellFont = [string] (Get-PropertyValue $cellValue 'font' $cellFont)
+                $cellFontSize = [string] (Get-PropertyValue $cellValue 'fontSize' $cellFontSize)
+                $cellFontColor = [string] (Get-PropertyValue $cellValue 'fontColor' $cellFontColor)
+            }
             $cellLeft = $left + $c * $cellWidth
             $cellTop = $top - $r * $cellHeight
             $shape = $Page.DrawRectangle($cellLeft, $cellTop - $cellHeight, $cellLeft + $cellWidth, $cellTop)
-            $shape.Text = if ($c -lt $row.Count) { [string] $row[$c] } else { '' }
+            $shape.Text = $cellText
             Set-ShapeStyle $shape ([pscustomobject]@{
-                fill = if ($r -lt $headerRows) { $headerFill } else { $fill }
-                line = $line
+                fill = $cellFill
+                line = $cellLine
                 lineWeight = [string] (Get-PropertyValue $Table 'lineWeight' '0.75 pt')
-                font = $font
-                fontSize = $fontSize
-                fontColor = [string] (Get-PropertyValue $Table 'fontColor' 'RGB(0,0,0)')
+                font = $cellFont
+                fontSize = $cellFontSize
+                fontColor = $cellFontColor
             })
         }
     }
+}
+
+function Add-Cylinder {
+    param($Page, $Cylinder)
+
+    $x = [double] (Get-PropertyValue $Cylinder 'x' 1)
+    $y = [double] (Get-PropertyValue $Cylinder 'y' 1)
+    $width = [double] (Get-PropertyValue $Cylinder 'width' 1.2)
+    $height = [double] (Get-PropertyValue $Cylinder 'height' 0.8)
+    $ellipseHeight = [double] (Get-PropertyValue $Cylinder 'ellipseHeight' 0.18)
+    $left = $x - $width / 2
+    $right = $x + $width / 2
+    $bottom = $y - $height / 2
+    $top = $y + $height / 2
+
+    $body = $Page.DrawRectangle($left, $bottom, $right, $top)
+    $body.Text = [string] (Get-PropertyValue $Cylinder 'text' '')
+    Set-ShapeStyle $body ([pscustomobject]@{
+        fill = [string] (Get-PropertyValue $Cylinder 'fill' 'RGB(255,255,255)')
+        line = [string] (Get-PropertyValue $Cylinder 'line' 'RGB(120,120,120)')
+        lineWeight = [string] (Get-PropertyValue $Cylinder 'lineWeight' '1 pt')
+        font = [string] (Get-PropertyValue $Cylinder 'font' 'Arial')
+        fontSize = [string] (Get-PropertyValue $Cylinder 'fontSize' '10 pt')
+    })
+
+    $topOval = $Page.DrawOval($left, $top - $ellipseHeight, $right, $top + $ellipseHeight)
+    Set-ShapeStyle $topOval ([pscustomobject]@{
+        fill = [string] (Get-PropertyValue $Cylinder 'fill' 'RGB(255,255,255)')
+        line = [string] (Get-PropertyValue $Cylinder 'line' 'RGB(120,120,120)')
+        lineWeight = [string] (Get-PropertyValue $Cylinder 'lineWeight' '1 pt')
+        fontSize = '1 pt'
+    })
+    $topOval.Text = ''
+
+    $bottomOval = $Page.DrawOval($left, $bottom - $ellipseHeight, $right, $bottom + $ellipseHeight)
+    Set-ShapeStyle $bottomOval ([pscustomobject]@{
+        fill = 'none'
+        line = [string] (Get-PropertyValue $Cylinder 'line' 'RGB(120,120,120)')
+        lineWeight = [string] (Get-PropertyValue $Cylinder 'lineWeight' '1 pt')
+        fontSize = '1 pt'
+    })
+    $bottomOval.Text = ''
 }
 
 function Add-Tree {
@@ -531,6 +588,10 @@ foreach ($node in @(Get-PropertyValue $spec 'nodes' @())) {
 
 foreach ($table in @(Get-PropertyValue $spec 'tables' @())) {
     Add-Table $page $table
+}
+
+foreach ($cylinder in @(Get-PropertyValue $spec 'cylinders' @())) {
+    Add-Cylinder $page $cylinder
 }
 
 foreach ($tree in @(Get-PropertyValue $spec 'trees' @())) {
