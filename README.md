@@ -1,5 +1,7 @@
 # Codex Visio Skill
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Generate editable Microsoft Visio `.vsdx` diagrams from text descriptions with Codex.
 
 This repository contains a Codex plugin with one skill, `visio-diagram`. The skill uses a script-only workflow: Codex creates a JSON diagram specification and runs a bundled PowerShell script that automates Microsoft Visio through the Visio COM object model.
