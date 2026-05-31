@@ -917,6 +917,10 @@ $page.PageSheet.CellsU('PageHeight').FormulaU = "$pageHeight in"
 
 Add-Title $page ([string] (Get-PropertyValue $spec 'title' '')) $pageWidth $pageHeight
 
+foreach ($panel in @(Get-PropertyValue $spec 'panels' @())) {
+    Add-Panel $page $panel
+}
+
 $nodeMap = @{}
 foreach ($node in @(Get-PropertyValue $spec 'nodes' @())) {
     $created = Add-Node $page $node
@@ -924,10 +928,6 @@ foreach ($node in @(Get-PropertyValue $spec 'nodes' @())) {
         throw "Duplicate node id: $($created.Id)"
     }
     $nodeMap[$created.Id] = $created
-}
-
-foreach ($panel in @(Get-PropertyValue $spec 'panels' @())) {
-    Add-Panel $page $panel
 }
 
 foreach ($table in @(Get-PropertyValue $spec 'tables' @())) {
