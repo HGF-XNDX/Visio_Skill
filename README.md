@@ -39,7 +39,7 @@ figure-tests/
 In Codex, install the skill/plugin from this GitHub repository URL:
 
 ```text
-https://github.com/HGF-XNDX/Codex_Visio_Skill
+https://github.com/HGF-XNDX/Visio_Skill
 ```
 
 After installation, ask Codex to use `$visio-diagram`.
@@ -53,6 +53,18 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scrip
 ```
 
 By default, the generated diagram is opened as an unsaved Visio document so the user can inspect, edit, and choose how to save it from Visio.
+
+Export a PNG preview for visual review:
+
+```powershell
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -ExportPngPath .\diagram-preview.png
+```
+
+When revising an open diagram, redraw the active Visio page instead of creating another document:
+
+```powershell
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\skills\visio-diagram\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -UseActiveDocument -ExportPngPath .\diagram-preview.png -Force
+```
 
 Use `-OutputPath` when the script should save a `.vsdx`, and use `-NoOpen` for automated smoke tests or batch generation:
 
@@ -76,4 +88,5 @@ Save it as paper-method.vsdx.
 - Existing output files are not overwritten unless the script is run with `-Force`.
 - By default, the script leaves Visio open and does not save a file; the user saves from Visio.
 - Use `-OutputPath`, `-Save`, or `-NoOpen` only when the script should write a `.vsdx`.
+- Use `-ExportPngPath` for visual review and `-UseActiveDocument` for iterative redraws in the same open Visio document.
 - The script does not run Visio macros.

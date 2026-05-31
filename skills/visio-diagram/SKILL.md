@@ -19,9 +19,9 @@ If Visio is unavailable, explain that this skill cannot render `.vsdx` locally a
 ## Workflow
 
 1. Convert the user's description into a diagram spec JSON file.
-2. Use `scripts/new_visio_diagram.ps1` to generate the `.vsdx`.
-3. Verify with shell/script output that the `.vsdx` exists and the script reports a document, page, and shape count.
-4. Iterate on layout, labels, colors, and connections by editing the JSON spec and rerunning the script.
+2. Use `scripts/new_visio_diagram.ps1` to generate or update the editable Visio diagram.
+3. Export a PNG preview with `-ExportPngPath` whenever visual quality matters, then inspect the PNG before deciding whether to iterate.
+4. Iterate on layout, labels, colors, and connections by editing the JSON spec and rerunning the script with `-UseActiveDocument` so the current Visio page is replaced instead of creating another document.
 
 Run from the skill directory or pass absolute paths:
 
@@ -30,6 +30,18 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.
 ```
 
 By default the script opens Visio, creates an unsaved editable diagram, and leaves it visible so the user can inspect, edit, and choose how to save from Visio. Use `-OutputPath` or `-Save` only when the user explicitly wants the script to save a `.vsdx`.
+
+Export a PNG preview for visual inspection:
+
+```powershell
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -ExportPngPath .\diagram-preview.png
+```
+
+When revising an already-open generated diagram, reuse the active Visio document and redraw the current page:
+
+```powershell
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\new_visio_diagram.ps1 -SpecPath .\diagram.json -UseActiveDocument -ExportPngPath .\diagram-preview.png -Force
+```
 
 Use `-Json` when command output will be parsed programmatically:
 
@@ -76,7 +88,8 @@ Coordinates are in Visio inches. The origin is bottom-left. A good default page 
 - Keep at least 1 inch between node centers horizontally and 1.25 inches vertically for readability.
 - Use short labels on connectors.
 - Use pastel fills for node categories; avoid relying only on color to encode meaning.
-- Prefer creating a new `.vsdx` unless the user explicitly asks to modify the current Visio document.
+- When the user asks for revisions, prefer `-UseActiveDocument` so the current Visio page is redrawn in place instead of creating another document.
+- For non-trivial diagrams, export a PNG preview and inspect it before presenting the result.
 
 For paper-figure recreation or reference-image style diagrams:
 
@@ -104,7 +117,7 @@ For paper-figure recreation or reference-image style diagrams:
 
 - Use only file operations, PowerShell, and the Visio COM object model.
 - Do not invoke Computer Use or any screen-based automation to operate Visio.
-- Do not verify by screenshot; verify by script output, file existence, file size, and COM-reported shape count.
+- Do not use desktop screenshots for verification. Use script output, file existence, COM-reported shape count, and script-exported PNG previews.
 - The default behavior leaves the generated file visible in Visio; it is still script-driven and does not require UI interaction.
 - The default behavior does not save a `.vsdx`; the user chooses whether and where to save from Visio.
 - Use `-NoOpen` for automated verification when the document should be saved and closed without leaving a Visio window open.

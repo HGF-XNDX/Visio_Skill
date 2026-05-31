@@ -1,9 +1,11 @@
 ﻿param(
     [string] $SpecPath,
     [string] $OutputPath,
+    [string] $ExportPngPath,
     [switch] $Open,
     [switch] $NoOpen,
     [switch] $Save,
+    [switch] $UseActiveDocument,
     [switch] $Force,
     [switch] $Json
 )
@@ -45,6 +47,14 @@ function Get-PropertyValue {
     $property = $Object.PSObject.Properties[$Name]
     if ($null -eq $property -or $null -eq $property.Value) { return $Default }
     return $property.Value
+}
+
+function Clear-Page {
+    param($Page)
+
+    for ($i = $Page.Shapes.Count; $i -ge 1; $i -= 1) {
+        $Page.Shapes.Item($i).Delete()
+    }
 }
 
 function New-SubscriptText {
@@ -878,6 +888,7 @@ $keepOpen = [bool] $Open -or -not [bool] $NoOpen
 $hasOutputPath = -not [string]::IsNullOrWhiteSpace($OutputPath)
 $shouldSave = [bool] $Save -or [bool] $NoOpen -or $hasOutputPath
 $resolvedOutput = $null
+$resolvedExportPng = $null
 
 if ($shouldSave) {
     if (-not $hasOutputPath) {
@@ -894,6 +905,17 @@ if ($shouldSave) {
     }
 }
 
+if (-not [string]::IsNullOrWhiteSpace($ExportPngPath)) {
+    $resolvedExportPng = [System.IO.Path]::GetFullPath($ExportPngPath)
+    $exportDirectory = Split-Path -Parent $resolvedExportPng
+    if ($exportDirectory -and -not (Test-Path -LiteralPath $exportDirectory)) {
+        New-Item -ItemType Directory -Path $exportDirectory | Out-Null
+    }
+    if ((Test-Path -LiteralPath $resolvedExportPng) -and -not $Force) {
+        throw "ExportPngPath already exists: $resolvedExportPng. Re-run with -Force only after overwrite is approved."
+    }
+}
+
 try {
     $visio = [Runtime.InteropServices.Marshal]::GetActiveObject('Visio.Application')
     $createdVisio = $false
@@ -903,8 +925,24 @@ try {
 }
 
 $visio.Visible = $keepOpen
-$doc = $visio.Documents.Add('')
-$page = $visio.ActivePage
+$reusedActiveDocument = $false
+if ($UseActiveDocument) {
+    try {
+        $doc = $visio.ActiveDocument
+        $page = $visio.ActivePage
+        if ($null -eq $doc -or $null -eq $page) {
+            throw 'No active Visio document or page is available.'
+        }
+        Clear-Page $page
+        $reusedActiveDocument = $true
+    } catch {
+        $doc = $visio.Documents.Add('')
+        $page = $visio.ActivePage
+    }
+} else {
+    $doc = $visio.Documents.Add('')
+    $page = $visio.ActivePage
+}
 
 $pageSpec = Get-PropertyValue $spec 'page' $null
 $pageWidth = [double] (Get-PropertyValue $pageSpec 'width' 11)
@@ -990,9 +1028,15 @@ if ($keepOpen) {
     $visio.ActiveWindow.Page = $page
 }
 
+if ($resolvedExportPng) {
+    $page.Export($resolvedExportPng)
+}
+
 $result = [pscustomobject]@{
     OutputPath = $resolvedOutput
+    ExportPngPath = $resolvedExportPng
     Saved = $shouldSave
+    ReusedActiveDocument = $reusedActiveDocument
     Document = $doc.Name
     Page = $page.Name
     ShapeCount = $page.Shapes.Count
