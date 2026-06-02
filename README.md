@@ -89,4 +89,7 @@ Save it as paper-method.vsdx.
 - By default, the script leaves Visio open and does not save a file; the user saves from Visio.
 - Use `-OutputPath`, `-Save`, or `-NoOpen` only when the script should write a `.vsdx`.
 - Use `-ExportPngPath` for visual review and `-UseActiveDocument` for iterative redraws in the same open Visio document.
+- For readable diagrams, avoid placing text directly on connector lines. Use standalone labels beside lines, preferably with a white fill.
+- Avoid overlapping connectors by routing feedback loops above the main flow and data/writeback paths below data nodes.
+- Treat the exported PNG as the visual QA artifact: inspect it and redraw the active page until labels, lines, and nodes no longer overlap.
 - The script does not run Visio macros.

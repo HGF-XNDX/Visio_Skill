@@ -123,8 +123,8 @@ Optional fields:
 - `nodes[].font`, `nodes[].fontSize`, `nodes[].fontColor`, `nodes[].lineWeight`.
 - `nodes[].layerCopies`, `nodes[].copyOffsetX`, `nodes[].copyOffsetY`, `nodes[].copyFill`, `nodes[].copyLine`.
 - `nodes[].subscripts`: convert common underscore tokens such as `G_1`, `W_k`, and `P_new`.
-- `links[].text`, `links[].style`; use `arrow` for a directed connector or `line` for no arrow.
-- `arrows[]`: explicit coordinate arrows with `x1`, `y1`, `x2`, `y2`, optional `text`, `line`, `lineWeight`, `style`.
+- `links[].text`, `links[].style`; use `arrow` for a directed connector or `line` for no arrow. Avoid `text` in complex diagrams; prefer standalone `labels`.
+- `arrows[]`: explicit coordinate arrows with `x1`, `y1`, `x2`, `y2`, optional `text`, `line`, `lineWeight`, `style`. Avoid `text` when it would sit on top of the line.
 - `labels[]`: free-positioned text boxes. They default to no fill and no border. Set `subscripts: true` for underscore tokens.
 - `panels[]`: framed paper modules with `title`, `x`, `y`, `width`, `height`, optional `fill`, `headerFill`, `line`, `fontSize`.
 - `tables[]`: grid tables with `rows`, `x`, `y`, `width`, `height`, optional `headerRows`, `colWidths`, `rowHeights`, `fill`, `headerFill`, `line`, `fontSize`, and `subscripts`.
@@ -149,6 +149,18 @@ Default colors:
 - Warning or cache: `RGB(255,235,238)`
 
 The script draws direct connectors between node edges based on node center positions. For complex routing or paper-style diagrams, use explicit `arrows`, `elbowConnectors`, or `curvedConnectors`.
+
+## Visual QA and Anti-Overlap
+
+For complex diagrams, connector labels can become unreadable because Visio places connector text at the line midpoint. Prefer this pattern:
+
+- Use connectors only for direction and topology.
+- Put explanations in independent `labels` near the relevant line.
+- Give labels a white fill, for example `"fill": "RGB(255,255,255)"`, when they sit near other shapes.
+- Route feedback loops above the main flow and data/writeback loops below the data nodes.
+- Do not let multiple connectors share the same exact segment; give each path its own lane.
+- Avoid vertical support lines from a memory/support band to every node unless they are essential.
+- Export a PNG preview with `-ExportPngPath` and inspect it before considering the diagram complete.
 
 Use `tables` for score matrices or detail boxes instead of manually positioning dozens of labels. Use styled table cells for highlighted values, green/red status text, and highlighted headers. Use `barCharts` and `lineCharts` for small performance panels; they are not a replacement for publication-quality statistical plotting, but are much more stable than manually drawn rectangles.
 

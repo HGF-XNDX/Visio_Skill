@@ -1,6 +1,6 @@
 {
   "name": "visio-diagram",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Generate editable Microsoft Visio diagrams and paper-style method figures from text descriptions using script-only Visio COM automation.",
   "author": {
     "name": "Local developer"
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Visio Diagram",
     "shortDescription": "Create editable Visio .vsdx diagrams and paper figures.",
-    "longDescription": "Visio Diagram helps Codex convert architecture, network, topology, flow, process, and paper method figure descriptions into editable Microsoft Visio diagrams by generating a JSON diagram specification and running a bundled PowerShell script against Visio's COM automation API. By default it creates an unsaved visible Visio document so the user can inspect, edit, and save manually. It can export PNG previews for visual review and redraw the active Visio page for iterative revisions. It includes paper-oriented primitives such as panels, tables, lists, trees, icons, cylinders, bar charts, line charts, and routed connectors. It is a script-only workflow and does not rely on desktop UI automation.",
+    "longDescription": "Visio Diagram helps Codex convert architecture, network, topology, flow, process, and paper method figure descriptions into editable Microsoft Visio diagrams by generating a JSON diagram specification and running a bundled PowerShell script against Visio's COM automation API. By default it creates an unsaved visible Visio document so the user can inspect, edit, and save manually. It can export PNG previews for visual review and redraw the active Visio page for iterative revisions, with guidance to avoid overlapping text, connectors, and nodes. It includes paper-oriented primitives such as panels, tables, lists, trees, icons, cylinders, bar charts, line charts, and routed connectors. It is a script-only workflow and does not rely on desktop UI automation.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [

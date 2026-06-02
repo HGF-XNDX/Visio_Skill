@@ -86,10 +86,22 @@ Coordinates are in Visio inches. The origin is bottom-left. A good default page 
 
 - Use left-to-right flow for request paths and top-to-bottom flow for layered systems.
 - Keep at least 1 inch between node centers horizontally and 1.25 inches vertically for readability.
-- Use short labels on connectors.
+- Avoid connector text for non-trivial diagrams. Put explanatory text in separate `labels` near the connector instead of using `links[].text`, `arrows[].text`, or connector `text`.
 - Use pastel fills for node categories; avoid relying only on color to encode meaning.
 - When the user asks for revisions, prefer `-UseActiveDocument` so the current Visio page is redrawn in place instead of creating another document.
 - For non-trivial diagrams, export a PNG preview and inspect it before presenting the result.
+
+## Anti-Overlap Rules
+
+Apply these rules before presenting a diagram:
+
+- Do not let text sit directly on top of lines. Use standalone `labels` with `fill: "RGB(255,255,255)"` near the line if an explanation is needed.
+- Do not let two connectors share the same horizontal or vertical segment. Assign separate lanes: main flow on top, data flow in the middle, memory/support flow at the bottom.
+- Keep feedback loops outside the main path. Route planning/feedback loops above the main flow and data/writeback loops below the data nodes.
+- Keep memory/support as a band or standalone node when possible. Avoid many vertical dashed lines from memory to every agent.
+- Use `elbowConnectors` for long routed paths and place labels beside elbows, not at the line midpoint.
+- If a label, arrowhead, or connector crosses a node, move the connector lane or remove the label.
+- After every non-trivial generation or revision, use `-ExportPngPath`, inspect the PNG, then revise with `-UseActiveDocument` until no obvious text/line/node overlap remains.
 
 For paper-figure recreation or reference-image style diagrams:
 
